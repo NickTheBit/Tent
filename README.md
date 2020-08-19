@@ -10,4 +10,5 @@ The following code constitutes the entirety of the web controller of the shades.
 * mozzilla web thing
 
 ## Warning
-The display `doesn't work` unless the TFT library is modified
+* The display `doesn't work` unless the TFT library is modified
+* Filesystem updates need to be executed seperatly command is: `platformio -t uploadfs`

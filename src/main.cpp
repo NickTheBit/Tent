@@ -1,78 +1,61 @@
+#include "Button2.h"
 #include <Arduino.h>
+#include <ESPAsyncWebServer.h>
+#include <ESPmDNS.h>
+#include <SPIFFS.h>
 #include <TFT_eSPI.h>
 #include <WiFi.h>
 #include <WiFiClient.h>
-#include <WebServer.h>
-#include <ESPmDNS.h>
-#include "Button2.h"
-
 
 #ifndef TFT_DISPOFF
 #define TFT_DISPOFF 0x28
 #endif
 
 #ifndef TFT_SLPIN
-#define TFT_SLPIN   0x10
+#define TFT_SLPIN 0x10
 #endif
 
-#define TFT_MOSI            19
-#define TFT_SCLK            18
-#define TFT_CS              5
-#define TFT_DC              16
-#define TFT_RST             23
+#define TFT_MOSI 19
+#define TFT_SCLK 18
+#define TFT_CS 5
+#define TFT_DC 16
+#define TFT_RST 23
 
-#define TFT_BL              4   // Display backlight control pin
-#define ADC_EN              14  //ADC_EN is the ADC detection enable port
-#define ADC_PIN             34
-#define BUTTON_1            35
-#define BUTTON_2            0
+#define TFT_BL 4  // Display backlight control pin
+#define ADC_EN 14 // ADC_EN is the ADC detection enable port
+#define ADC_PIN 34
+#define BUTTON_1 35
+#define BUTTON_2 0
 
 TFT_eSPI tft = TFT_eSPI(135, 240); // Invoke custom library
 Button2 btn1(BUTTON_1);
 Button2 btn2(BUTTON_2);
 
-char buff[512];
-int vref = 1100;
-int btnCick = false;
+const char *ssid = "Getofmylawn";
+const char *password = "Rtfm-Qf6";
 
-const char* ssid = "Getofmylawn";
-const char* password = "Rtfm-Qf6";
-
-WebServer server(80);
+AsyncWebServer server(80);
 
 const int led = 13;
 
-void handleRoot() {
-  digitalWrite(led, 1);
-  server.send(200, "text/plain", "hello from esp32!");
-  digitalWrite(led, 0);
+// Processor handles all placeholders in html file
+String processor(const String &var) {
+  if (var == "id") {
+    // gets placeholders and replaces them with the value in the controller
+    Serial.println("Called");
+    return "ok";
+  }
+  return String();
 }
 
-void handleNotFound() {
-  digitalWrite(led, 1);
-  String message = "File Not Found\n\n";
-  message += "URI: ";
-  message += server.uri();
-  message += "\nMethod: ";
-  message += (server.method() == HTTP_GET) ? "GET" : "POST";
-  message += "\nArguments: ";
-  message += server.args();
-  message += "\n";
-  for (uint8_t i = 0; i < server.args(); i++) {
-    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
-  }
-  server.send(404, "text/plain", message);
-  digitalWrite(led, 0);
-}
 
 void setup(void) {
+
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
   Serial.begin(115200);
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  Serial.println("");
 
+  // Screen initialization
   tft.init();
   tft.setRotation(0);
   tft.fillScreen(TFT_BLACK);
@@ -80,7 +63,18 @@ void setup(void) {
   tft.setTextColor(TFT_GREEN);
   tft.setCursor(0, 0);
   tft.setTextDatum(MC_DATUM);
-  tft.setTextSize(1);
+  tft.setTextSize(2);
+
+  // Filesystem initialization for website
+  if (!SPIFFS.begin(true)) {
+    Serial.println("An Error has occurred while mounting SPIFFS");
+    return;
+  }
+
+  // Wifi handling
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  Serial.println("");
 
   // Wait for connection
   while (WiFi.status() != WL_CONNECTED) {
@@ -92,25 +86,41 @@ void setup(void) {
   Serial.println(ssid);
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
+  tft.print("Connected:\n");
+  tft.println(WiFi.localIP());
 
   if (MDNS.begin("tenta")) {
     Serial.println("MDNS responder started");
   }
 
-  server.on("/", handleRoot);
-
-  server.on("/inline", []() {
-    server.send(200, "text/plain", "this works as well");
-    tft.drawString("Thats ok", tft.width() / 2, tft.height() / 2 - 44);
+  // Route for root / web page
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/index.html", String(), false, processor);
+  });
+  
+  // Route to load style.css file
+  server.on("/cosmetics.css", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/cosmetics.css", "text/css");
   });
 
-  server.onNotFound(handleNotFound);
+  // Route to set GPIO to HIGH
+  server.on("/on", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/index.html", String(), false, processor);
+    Serial.println("On sent.");
+  });
+  
+  // Route to set GPIO to LOW
+  server.on("/off", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/index.html", String(), false, processor);
+    Serial.println("off sent");
+  });
 
+
+  // Start server
   server.begin();
-  tft.drawString("Http server started", tft.width() / 2, tft.height() / 2 - 32);
+
+  tft.println("\nHttp server started");
   Serial.println("HTTP server started");
 }
 
-void loop(void) {
-  server.handleClient();
-}
+void loop(void) { delay(10000); }
