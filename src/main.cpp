@@ -1,5 +1,5 @@
-#include "Button2.h"
 #include <Arduino.h>
+#include "Button2.h"
 #include <ESPAsyncWebServer.h>
 #include <ESPmDNS.h>
 #include <SPIFFS.h>
@@ -31,12 +31,11 @@ TFT_eSPI tft = TFT_eSPI(135, 240); // Invoke custom library
 Button2 btn1(BUTTON_1);
 Button2 btn2(BUTTON_2);
 
+// Remove hardcoded instances
 const char *ssid = "Getofmylawn";
 const char *password = "Rtfm-Qf6";
 
 AsyncWebServer server(80);
-
-const int led = 13;
 
 // Processor handles all placeholders in html file
 String processor(const String &var) {
@@ -51,8 +50,6 @@ String processor(const String &var) {
 
 void setup(void) {
 
-  pinMode(led, OUTPUT);
-  digitalWrite(led, 0);
   Serial.begin(115200);
 
   // Screen initialization

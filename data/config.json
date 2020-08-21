@@ -1,0 +1,32 @@
+{
+    "tents": [
+        {
+            "id": 1,
+            "up_relay": 1,
+            "down_relay": 2,
+            "speed": 23.322,
+            "curposition": 0
+        },
+        {
+            "id": 2,
+            "up_relay": 3,
+            "down_relay": 4,
+            "speed": 23.322,
+            "curposition": 30
+        },
+        {
+            "id": 3,
+            "up_relay": 5,
+            "down_relay": 6,
+            "speed": 23.322,
+            "curposition": 60
+        },
+        {
+            "id": 4,
+            "up_relay": 7,
+            "down_relay": 8,
+            "speed": 23.322,
+            "curposition": 100
+        }
+    ]
+}
