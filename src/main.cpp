@@ -39,85 +39,83 @@ AsyncWebServer server(80);
 
 // Processor handles all placeholders in html file
 String processor(const String &var) {
-  if (var == "id") {
-    // gets placeholders and replaces them with the value in the controller
-    Serial.println("Called");
-    return "ok";
-  }
-  return String();
+    if (var == "id") {
+        // gets placeholders and replaces them with the value in the controller
+        Serial.println("Called");
+        return "ok";
+    }
+    return String();
 }
-
 
 void setup(void) {
 
-  Serial.begin(115200);
+    Serial.begin(115200);
 
-  // Screen initialization
-  tft.init();
-  tft.setRotation(0);
-  tft.fillScreen(TFT_BLACK);
-  tft.setTextSize(9);
-  tft.setTextColor(TFT_GREEN);
-  tft.setCursor(0, 0);
-  tft.setTextDatum(MC_DATUM);
-  tft.setTextSize(2);
+    // Screen initialization
+    tft.init();
+    tft.setRotation(0);
+    tft.fillScreen(TFT_BLACK);
+    tft.setTextSize(9);
+    tft.setTextColor(TFT_GREEN);
+    tft.setCursor(0, 0);
+    tft.setTextDatum(MC_DATUM);
+    tft.setTextSize(2);
 
-  // Filesystem initialization for website
-  if (!SPIFFS.begin(true)) {
-    Serial.println("An Error has occurred while mounting SPIFFS");
-    return;
-  }
+    // Filesystem initialization for website
+    if (!SPIFFS.begin(true)) {
+        Serial.println("An Error has occurred while mounting SPIFFS");
+        return;
+    }
 
-  // Wifi handling
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  Serial.println("");
+    // Wifi handling
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(ssid, password);
+    Serial.println("");
 
-  // Wait for connection
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("");
-  Serial.print("Connected to ");
-  Serial.println(ssid);
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
-  tft.print("Connected:\n");
-  tft.println(WiFi.localIP());
+    // Wait for connection
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+    }
+    Serial.println("");
+    Serial.print("Connected to ");
+    Serial.println(ssid);
+    Serial.print("IP address: ");
+    Serial.println(WiFi.localIP());
+    tft.print("Connected:\n");
+    tft.println(WiFi.localIP());
 
-  if (MDNS.begin("tenta")) {
-    Serial.println("MDNS responder started");
-  }
+    if (MDNS.begin("tenta")) {
+        Serial.println("MDNS responder started");
+    }
 
-  // Route for root / web page
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/index.html", String(), false, processor);
-  });
-  
-  // Route to load style.css file
-  server.on("/cosmetics.css", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/cosmetics.css", "text/css");
-  });
+    // Route for root / web page
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(SPIFFS, "/index.html", String(), false, processor);
+    });
 
-  // Route to set GPIO to HIGH
-  server.on("/on", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/index.html", String(), false, processor);
-    Serial.println("On sent.");
-  });
-  
-  // Route to set GPIO to LOW
-  server.on("/off", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/index.html", String(), false, processor);
-    Serial.println("off sent");
-  });
+    // Route to load style.css file
+    server.on("/cosmetics.css", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(SPIFFS, "/cosmetics.css", "text/css");
+    });
 
+    // Route to set GPIO to HIGH
+    server.on("/on", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(SPIFFS, "/index.html", String(), false, processor);
+        Serial.println("On sent.");
+    });
 
-  // Start server
-  server.begin();
+    // Route to set GPIO to LOW
+    server.on("/off", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(SPIFFS, "/index.html", String(), false, processor);
+        Serial.println("off sent");
+    });
 
-  tft.println("\nHttp server started");
-  Serial.println("HTTP server started");
+    // Start server
+    server.begin();
+
+    tft.println("\nHttp server started");
+    Serial.println("HTTP server started");
 }
 
 void loop(void) { delay(10000); }
