@@ -11,4 +11,4 @@ The following code constitutes the entirety of the web controller of the shades.
 
 ## Warning
 * The display `doesn't work` unless the TFT library is modified
-* Filesystem updates need to be executed seperatly command is: `platformio -t uploadfs`
+* Filesystem updates need to be executed seperatly command is: `platformio run -t uploadfs`
