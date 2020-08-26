@@ -46,4 +46,5 @@ int Tent::setstat(int position) {
         Serial.println("No movement");
         return 0;
     }
+    return 1;
 }

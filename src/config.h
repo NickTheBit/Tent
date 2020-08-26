@@ -37,6 +37,5 @@ Config::Config() {
             tents[i].speed = config["tents"][i]["speed"];
             tents[i].cur_position = config["tents"][i]["curposition"];
         }
-    }
-    
+    }    
 }

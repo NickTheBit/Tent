@@ -6,6 +6,7 @@
 #include <TFT_eSPI.h>
 #include <WiFi.h>
 #include <WiFiClient.h>
+#include "config.h"
 
 #ifndef TFT_DISPOFF
 #define TFT_DISPOFF 0x28
@@ -53,7 +54,7 @@ void setup(void) {
 
     // Screen initialization
     tft.init();
-    tft.setRotation(0);
+    tft.setRotation(1);
     tft.fillScreen(TFT_BLACK);
     tft.setTextSize(9);
     tft.setTextColor(TFT_GREEN);
@@ -85,7 +86,8 @@ void setup(void) {
     tft.print("Connected:\n");
     tft.println(WiFi.localIP());
 
-    if (MDNS.begin("tenta")) {
+    if (MDNS.begin("tenta.local")) {
+        MDNS.addService("http","tcp",80);
         Serial.println("MDNS responder started");
     }
 
@@ -111,9 +113,11 @@ void setup(void) {
         Serial.println("off sent");
     });
 
+    Config cfg = Config();
+    Serial.println(cfg.tents->cur_position);
+
     // Start server
     server.begin();
-
     tft.println("\nHttp server started");
     Serial.println("HTTP server started");
 }
