@@ -2,29 +2,29 @@
     "tents": [
         {
             "id": 1,
-            "up_relay": 1,
-            "down_relay": 2,
+            "up_relay": 27,
+            "down_relay": 26,
             "speed": 30000,
             "curposition": 0
         },
         {
             "id": 2,
-            "up_relay": 3,
-            "down_relay": 4,
+            "up_relay": 25,
+            "down_relay": 21,
             "speed": 23.322,
             "curposition": 30
         },
         {
             "id": 3,
-            "up_relay": 5,
-            "down_relay": 6,
-            "speed": 30000,
-            "curposition": 60
+            "up_relay": 13,
+            "down_relay": 12,
+            "speed": 500,
+            "curposition": 0
         },
         {
             "id": 4,
-            "up_relay": 7,
-            "down_relay": 8,
+            "up_relay": 22,
+            "down_relay": 17,
             "speed": 23.322,
             "curposition": 100
         }

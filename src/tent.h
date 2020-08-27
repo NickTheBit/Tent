@@ -32,17 +32,16 @@ int Tent::setstat(int position) {
     float moving_time(0);
     if (position > cur_position) {
         moving_time = (position - cur_position) * speed;
+        Serial.print("Moving up: ");
         Serial.println(moving_time);
         goUp(moving_time);
         cur_position = position;
-        Serial.print("Moving up: ");
-        Serial.println(moving_time);
     } else if (position < cur_position) {
         moving_time = (cur_position - position) * speed;
-        goDown(moving_time);
-        cur_position = position;
         Serial.print("Moving down: ");
         Serial.println(moving_time);
+        goDown(moving_time);
+        cur_position = position;
     } else {
         Serial.println("No movement");
         return 0;
@@ -51,17 +50,19 @@ int Tent::setstat(int position) {
 }
 
 int Tent::goUp(float time) {
-    pinMode(up_relay, OUTPUT);
-    digitalWrite(up_relay, HIGH);
-    delay(time);
+    Serial.println("Up active");
     digitalWrite(up_relay, LOW);
+    delay(time);
+    digitalWrite(up_relay, HIGH);
+    Serial.println("Up finished");
     return 0;
 }
 
 int Tent::goDown(float time) {
-    pinMode(down_relay, OUTPUT);
-    digitalWrite(down_relay, HIGH);
-    delay(time);
+    Serial.println("Down active");
     digitalWrite(down_relay, LOW);
+    delay(time);
+    digitalWrite(down_relay, HIGH);
+    Serial.println("Down finished");
     return 0;
 }

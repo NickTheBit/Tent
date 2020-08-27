@@ -111,14 +111,21 @@ void setup(void) {
         Serial.println("off sent");
     });
 
-    Config cfg = Config();
-    // cfg.tents[2].setstat(66);
-    // Serial.println(cfg.tents[2].cur_position);
-
     // Start server
     server.begin();
     tft.println("\nHttp server started");
     Serial.println("HTTP server started");
+    
+    delay(10000);
+    Config cfg = Config();
+    delay(10000);
+    cfg.tents[2].setstat(10);
+    delay(10000);
+    cfg.tents[2].setstat(20);
+    delay(10000);
+    cfg.tents[2].setstat(0);
+    
+
 }
 
 void loop(void) { delay(10000); }

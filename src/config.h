@@ -37,6 +37,12 @@ Config::Config() {
             tents[i].down_relay = config["tents"][i]["down_relay"];
             tents[i].speed = config["tents"][i]["speed"];
             tents[i].cur_position = config["tents"][i]["curposition"];
+            pinMode(tents[i].up_relay, OUTPUT);
+            pinMode(tents[i].down_relay, OUTPUT);
+            digitalWrite(tents[i].down_relay, HIGH);
+            digitalWrite(tents[i].up_relay, HIGH);
+            Serial.println(tents[i].down_relay);
+            Serial.println(tents[i].up_relay);
         }
     }    
 }
