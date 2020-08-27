@@ -7,6 +7,7 @@
 class Config {
 
     public:
+        int number;
         Tent *tents;
         Config();
 };
@@ -28,9 +29,9 @@ Config::Config() {
         DynamicJsonBuffer jb;
         JsonObject& config = jb.parseObject(file);
         file.close();
-        int arraySize = config["tents"].size();
-        tents = new Tent[arraySize];
-        for (i=0; i<arraySize; i++) {
+        number = config["tents"].size();
+        tents = new Tent[number];
+        for (i=0; i<number; i++) {
             tents[i].id = config["tents"][i]["id"];
             tents[i].up_relay = config["tents"][i]["up_relay"];
             tents[i].down_relay = config["tents"][i]["down_relay"];

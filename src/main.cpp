@@ -71,7 +71,6 @@ void setup(void) {
     // Wifi handling
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
-    Serial.println("");
 
     // Wait for connection
     while (WiFi.status() != WL_CONNECTED) {
@@ -88,7 +87,6 @@ void setup(void) {
 
     if (MDNS.begin("tenta.local")) {
         MDNS.addService("http","tcp",80);
-        Serial.println("MDNS responder started");
     }
 
     // Route for root / web page
@@ -114,7 +112,8 @@ void setup(void) {
     });
 
     Config cfg = Config();
-    Serial.println(cfg.tents->cur_position);
+    // cfg.tents[2].setstat(66);
+    // Serial.println(cfg.tents[2].cur_position);
 
     // Start server
     server.begin();

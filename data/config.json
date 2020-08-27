@@ -4,7 +4,7 @@
             "id": 1,
             "up_relay": 1,
             "down_relay": 2,
-            "speed": 23.322,
+            "speed": 30000,
             "curposition": 0
         },
         {
@@ -18,7 +18,7 @@
             "id": 3,
             "up_relay": 5,
             "down_relay": 6,
-            "speed": 23.322,
+            "speed": 30000,
             "curposition": 60
         },
         {
