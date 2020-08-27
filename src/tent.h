@@ -1,4 +1,3 @@
-#include <iostream>
 #include <Arduino.h>
 
 #define FILENAME "config.dat"

@@ -89,6 +89,9 @@ void setup(void) {
         MDNS.addService("http","tcp",80);
     }
 
+    // Load configuration
+    Config cfg = Config();
+
     // Route for root / web page
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send(SPIFFS, "/index.html", String(), false, processor);
@@ -97,16 +100,17 @@ void setup(void) {
     // Route to load style.css file
     server.on("/cosmetics.css", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send(SPIFFS, "/cosmetics.css", "text/css");
+
     });
 
     // Route to set GPIO to HIGH
-    server.on("/on", HTTP_GET, [](AsyncWebServerRequest *request) {
+    server.on("/on", HTTP_GET, [cfg](AsyncWebServerRequest *request) {
         request->send(SPIFFS, "/index.html", String(), false, processor);
         Serial.println("On sent.");
     });
 
     // Route to set GPIO to LOW
-    server.on("/off", HTTP_GET, [](AsyncWebServerRequest *request) {
+    server.on("/off", HTTP_GET, [cfg](AsyncWebServerRequest *request) {
         request->send(SPIFFS, "/index.html", String(), false, processor);
         Serial.println("off sent");
     });
@@ -116,16 +120,6 @@ void setup(void) {
     tft.println("\nHttp server started");
     Serial.println("HTTP server started");
     
-    delay(10000);
-    Config cfg = Config();
-    delay(10000);
-    cfg.tents[2].setstat(10);
-    delay(10000);
-    cfg.tents[2].setstat(20);
-    delay(10000);
-    cfg.tents[2].setstat(0);
-    
-
 }
 
 void loop(void) { delay(10000); }

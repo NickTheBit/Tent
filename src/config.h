@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <iostream>
 #include <SPIFFS.h>
 #include <ArduinoJson.h>
 #include "tent.h"
@@ -13,7 +12,7 @@ class Config {
 };
 
 Config::Config() {
-    int i,j;
+    int i;
     Serial.begin(115200);
     if (!SPIFFS.begin(true)) {
         Serial.println("Storage failure");
