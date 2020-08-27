@@ -6,7 +6,8 @@
 #include <TFT_eSPI.h>
 #include <WiFi.h>
 #include <WiFiClient.h>
-#include "config.h"
+#include "tent.h"
+#include <ArduinoJson.h>
 
 #ifndef TFT_DISPOFF
 #define TFT_DISPOFF 0x28
@@ -62,12 +63,6 @@ void setup(void) {
     tft.setTextDatum(MC_DATUM);
     tft.setTextSize(2);
 
-    // Filesystem initialization for website
-    if (!SPIFFS.begin(true)) {
-        Serial.println("An Error has occurred while mounting SPIFFS");
-        return;
-    }
-
     // Wifi handling
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
@@ -90,7 +85,38 @@ void setup(void) {
     }
 
     // Load configuration
-    Config cfg = Config();
+    int i;
+    Tent *tents;
+    if (!SPIFFS.begin(true)) {
+        Serial.println("Storage failure");
+    }
+    File file = SPIFFS.open("/config.json","r+");
+    if (!file) {
+        Serial.println("Config not found\nGenerating...");
+        file = SPIFFS.open("./config.json","w");
+
+
+    } else {
+        // Config exists prepare classes
+        DynamicJsonBuffer jb;
+        JsonObject& config = jb.parseObject(file);
+        file.close();
+        int number = config["tents"].size();
+        tents = new Tent[number];
+        for (i=0; i<number; i++) {
+            tents[i].id = config["tents"][i]["id"];
+            tents[i].up_relay = config["tents"][i]["up_relay"];
+            tents[i].down_relay = config["tents"][i]["down_relay"];
+            tents[i].speed = config["tents"][i]["speed"];
+            tents[i].cur_position = config["tents"][i]["curposition"];
+            pinMode(tents[i].up_relay, OUTPUT);
+            pinMode(tents[i].down_relay, OUTPUT);
+            digitalWrite(tents[i].down_relay, HIGH);
+            digitalWrite(tents[i].up_relay, HIGH);
+            Serial.println(tents[i].down_relay);
+            Serial.println(tents[i].up_relay);
+        }
+    }
 
     // Route for root / web page
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -104,15 +130,17 @@ void setup(void) {
     });
 
     // Route to set GPIO to HIGH
-    server.on("/on", HTTP_GET, [cfg](AsyncWebServerRequest *request) {
+    server.on("/on", HTTP_GET, [tents](AsyncWebServerRequest *request) {
         request->send(SPIFFS, "/index.html", String(), false, processor);
         Serial.println("On sent.");
+        tents[2].setstat(100);
     });
 
     // Route to set GPIO to LOW
-    server.on("/off", HTTP_GET, [cfg](AsyncWebServerRequest *request) {
+    server.on("/off", HTTP_GET, [tents](AsyncWebServerRequest *request) {
         request->send(SPIFFS, "/index.html", String(), false, processor);
         Serial.println("off sent");
+        tents[2].setstat(0);
     });
 
     // Start server
