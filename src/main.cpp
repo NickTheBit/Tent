@@ -80,7 +80,7 @@ void setup(void) {
     tft.print("Connected:\n");
     tft.println(WiFi.localIP());
 
-    if (MDNS.begin("tenta.local")) {
+    if (MDNS.begin("tenta")) {
         MDNS.addService("http","tcp",80);
     }
 
@@ -113,8 +113,10 @@ void setup(void) {
             pinMode(tents[i].down_relay, OUTPUT);
             digitalWrite(tents[i].down_relay, HIGH);
             digitalWrite(tents[i].up_relay, HIGH);
-            Serial.println(tents[i].down_relay);
-            Serial.println(tents[i].up_relay);
+            Serial.print(tents[i].down_relay);
+            Serial.println(" set to HIGH");
+            Serial.print(tents[i].up_relay);
+            Serial.println(" set to HIGH");
         }
     }
 

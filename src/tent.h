@@ -1,7 +1,17 @@
 #include <Arduino.h>
+#include <pthread.h>
 
 #define FILENAME "config.dat"
 // Serialize deserialize
+
+void * goUp(void *);
+void * goDown(void *);
+
+struct parser {
+    int up_relay;
+    int down_relay;
+    float time;
+};
 
 class Tent {
   public:
@@ -13,9 +23,7 @@ class Tent {
     int cur_position;
 
     Tent();
-    int setstat(int);
-    int goUp(float);
-    int goDown(float);
+    void setstat(int);
 };
 
 Tent::Tent() {
@@ -26,42 +34,53 @@ Tent::Tent() {
     speed = 0;
 }
 
-int Tent::setstat(int position) {
+void Tent::setstat(int position) {
     Serial.begin(115200);
+    pthread_t thread;
     float moving_time(0);
+
+    // Only one argument can be passed, struct essential
+    struct parser args;
+    args.down_relay = down_relay;
+    args.up_relay = up_relay;
+    
     if (position > cur_position) {
         moving_time = (position - cur_position) * speed;
-        Serial.print("Moving up: ");
-        Serial.println(moving_time);
-        goUp(moving_time);
+        // Serial.print("Moving up: ");
+        // Serial.println(moving_time);
         cur_position = position;
+        Serial.println(moving_time);    
+        args.time = moving_time;
+
+        pthread_create(&thread,NULL,&goUp,(void *)&args);
     } else if (position < cur_position) {
         moving_time = (cur_position - position) * speed;
-        Serial.print("Moving down: ");
-        Serial.println(moving_time);
-        goDown(moving_time);
+        // Serial.print("Moving down: ");
+        // Serial.println(moving_time);
         cur_position = position;
+        args.time = moving_time;
+        
+        pthread_create(&thread,NULL,&goDown,&args);
     } else {
         Serial.println("No movement");
-        return 0;
     }
-    return 1;
 }
 
-int Tent::goUp(float time) {
+void * goUp(void *data) {
+    struct parser *t = (struct parser *)data;
     Serial.println("Up active");
-    digitalWrite(up_relay, LOW);
-    delay(time);
-    digitalWrite(up_relay, HIGH);
+    digitalWrite(t->up_relay, LOW);
+    Serial.println(t->up_relay);
+    delay(t->time);
+    digitalWrite(t->down_relay, HIGH);
     Serial.println("Up finished");
-    return 0;
 }
 
-int Tent::goDown(float time) {
+void * goDown(void *data) {
+    struct parser *t = (struct parser *)data;
     Serial.println("Down active");
-    digitalWrite(down_relay, LOW);
-    delay(time);
-    digitalWrite(down_relay, HIGH);
+    digitalWrite(t->down_relay, LOW);
+    delay(t->time);
+    digitalWrite(t->down_relay, HIGH);
     Serial.println("Down finished");
-    return 0;
 }
