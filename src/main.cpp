@@ -94,8 +94,6 @@ void setup(void) {
     if (!file) {
         Serial.println("Config not found\nGenerating...");
         file = SPIFFS.open("./config.json","w");
-
-
     } else {
         // Config exists prepare classes
         DynamicJsonBuffer jb;
